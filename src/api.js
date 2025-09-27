@@ -13,7 +13,6 @@ export function saveTodos(todos) {
   localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
 }
 
-// (Optional) Fake fetch like React version
 export async function fetchTodos() {
   const res = await fetch("https://jsonplaceholder.typicode.com/todos");
   return res.json();

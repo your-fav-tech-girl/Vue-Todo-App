@@ -1,61 +1,61 @@
 <script setup>
-import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { loadTodos, saveTodos } from "../api";
+import { useQueryClient } from "@tanstack/vue-query";
 import Card from "./ui/Card.vue";
 import CardHeader from "./ui/CardHeader.vue";
+import CardTitle from "./ui/CardTitle.vue";
 import CardContent from "./ui/CardContent.vue";
 import CardFooter from "./ui/CardFooter.vue";
 import Button from "./ui/Button.vue";
 import Badge from "./ui/Badge.vue";
 import { CheckCircle2, Circle, Undo2, ArrowLeft } from "lucide-vue-next";
 
-// Get route params
 const route = useRoute();
 const router = useRouter();
-const id = route.params.id;
+const queryClient = useQueryClient();
 
-// Todos state
-const todos = ref(loadTodos());
-const todo = todos.value.find((t) => String(t.id) === id);
+// pull todos from Vue Query cache
+const todos = queryClient.getQueryData(["todos"]) || [];
+const todo = todos.find((t) => String(t.id) === route.params.id);
 
-if (!todo) {
-  console.warn("Todo not found");
-}
+// computed status
+const isDone = todo?.completed ?? false;
+const statusIcon = isDone ? CheckCircle2 : Circle;
+const statusText = isDone ? "Completed" : "Incomplete";
 
-// Toggle completed status
 function toggleStatus() {
-  const updated = todos.value.map((t) =>
-    t.id === todo.id ? { ...t, completed: !t.completed } : t
+  if (!todo) return;
+  queryClient.setQueryData(["todos"], (old = []) =>
+    old.map((t) => (t.id === todo.id ? { ...t, completed: !t.completed } : t))
   );
-  todos.value = updated;
-  saveTodos(updated);
 }
-
-const isDone = ref(todo?.completed ?? false);
 </script>
 
 <template>
   <div v-if="todo">
-    <Card>
-      <CardHeader>
-        <h2 class="font-bold text-lg">{{ todo.title }}</h2>
-        <Badge :variant="isDone ? 'success' : 'gray'">
-          <component :is="isDone ? CheckCircle2 : Circle" class="w-4 h-4" />
-          {{ isDone ? "Completed" : "Incomplete" }}
+    <Card class="max-w-md mx-auto">
+      <CardHeader class="flex flex-row items-center justify-between space-y-0">
+        <CardTitle>{{ todo.title }}</CardTitle>
+        <Badge
+          class="inline-flex items-center gap-1"
+          :class="isDone ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'"
+        >
+          <component :is="statusIcon" class="w-4 h-4" />
+          {{ statusText }}
         </Badge>
       </CardHeader>
 
-      <CardContent>
-        <p class="text-sm text-gray-600">ID #{{ todo.id }}</p>
+      <CardContent class="text-sm text-muted-foreground">
+        <p>ID #{{ todo.id }}</p>
       </CardContent>
 
-      <CardFooter>
-        <Button class="flex items-center gap-1" @click="toggleStatus">
+      <CardFooter class="flex justify-end gap-2">
+        <Button @click="toggleStatus" variant="default" class="gap-1">
           <Undo2 class="w-4 h-4" />
           Toggle Status
         </Button>
-        <Button class="flex items-center gap-1" @click="router.back()">
+
+        <Button @click="router.back()" variant="default" class="gap-1">
           <ArrowLeft class="w-4 h-4" />
           Back
         </Button>

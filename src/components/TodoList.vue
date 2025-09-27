@@ -167,7 +167,7 @@ function handleDelete() {
         <div class="flex gap-2 items-center">
           <Button
             @click="startEditing(todo)"
-            class="bg-white border border-gray-300 p-1 hover:bg-green-50 flex items-center justify-center"
+            class="bg-transparent border border-gray-300 p-1 hover:bg-green-50 flex items-center justify-center"
           >
             <Pencil class="w-4 h-4 text-green-500" />
           </Button>
@@ -180,7 +180,7 @@ function handleDelete() {
 
           <Button
             @click="confirmDelete(todo.id)"
-            class="bg-white border border-gray-300 p-1 hover:bg-red-50 flex items-center justify-center"
+            class="bg-transparent border border-gray-300 p-1 hover:bg-red-50 flex items-center justify-center"
           >
             <TrashIcon class="w-4 h-4 text-red-500" />
           </Button>
