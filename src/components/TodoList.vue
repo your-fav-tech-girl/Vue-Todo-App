@@ -150,8 +150,9 @@ function handleDelete() {
         >
           <component
             :is="todo.completed ? CheckCircle : Circle"
-            class="w-5 h-5 mt-1 text-gray-500"
+            class="w-5 h-5 mt-1 text-green-400"
           />
+
           <RouterLink
             :to="`/todos/${todo.id}`"
             :class="[
